@@ -32,6 +32,8 @@ public class Shift {
     @ToString.Exclude
     private List<EmployeeShift> employees;
 
+    private boolean isAvailable;
+    private String type;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

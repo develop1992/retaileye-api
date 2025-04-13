@@ -31,6 +31,9 @@ public class BodyCamera {
     @ToString.Exclude
     private List<Recording> recordings;
 
+    private String serialNumber;
+    private String model;
+    private String manufacturer;
     private Boolean isAvailable;
     private Boolean isActive;
 

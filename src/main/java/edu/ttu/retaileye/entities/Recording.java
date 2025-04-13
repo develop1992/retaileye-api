@@ -41,6 +41,7 @@ public class Recording {
     private List<Incident> incidents;
 
     private String filePath;
+    private String fileName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 
