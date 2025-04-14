@@ -1,5 +1,8 @@
 package edu.ttu.retaileye.services;
 
+import edu.ttu.retaileye.dtos.EmployeeDto;
+import edu.ttu.retaileye.dtos.EmployeeShiftDto;
+import edu.ttu.retaileye.dtos.ShiftDto;
 import edu.ttu.retaileye.entities.EmployeeShift;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.EmployeeShiftRepository;
@@ -7,33 +10,34 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShift, UUID> {
+public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShiftDto, UUID> {
 
-    private final EmployeeServiceImpl employeeService;
-    private final ShiftServiceImpl shiftService;
     private final EmployeeShiftRepository employeeShiftRepository;
 
     @Override
-    public EmployeeShift assignTo(UUID employeeId, UUID shiftId) {
-        log.info("Assigning employee with ID {} to shift with ID {}", employeeId, shiftId);
-
-        var employee = employeeService.getById(employeeId);
-        var shift = shiftService.getById(shiftId);
+    public EmployeeShiftDto assignTo(EmployeeShiftDto employeeShiftDto) {
+        var employee = EmployeeDto.toEntity(employeeShiftDto.getEmployeeDto());
+        var shift = ShiftDto.toEntity(employeeShiftDto.getShiftDto());
+        log.info("Assigning employee with ID {} to shift with ID {}", employee.getId(), shift.getId());
 
         var employeeShift = EmployeeShift.builder()
                 .employee(employee)
                 .shift(shift)
                 .build();
 
+        var errorMessage = String.format("Error assigning employee with ID %s to shift with ID %s", employee.getId(), shift.getId());
+
         try {
-            return employeeShiftRepository.save(employeeShift);
+            return Optional.of(employeeShiftRepository.save(employeeShift))
+                    .map(EmployeeShiftDto::fromEntity)
+                    .orElseThrow(() -> new NotFoundException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = String.format("Error assigning employee with ID %s to shift with ID %s", employeeId, shiftId);
             log.error(errorMessage, e);
             throw new RuntimeException(errorMessage, e);
         }
@@ -56,9 +60,10 @@ public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShift, UUID
     }
 
     @Override
-    public EmployeeShift getById(UUID id) {
+    public EmployeeShiftDto getById(UUID id) {
         log.info("Finding employee shift with ID {}", id);
         return employeeShiftRepository.findById(id)
+                .map(EmployeeShiftDto::fromEntity)
                 .orElseThrow(() -> new NotFoundException("Employee shift not found with ID: " + id));
     }
 }

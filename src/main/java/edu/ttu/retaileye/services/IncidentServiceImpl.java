@@ -1,6 +1,8 @@
 package edu.ttu.retaileye.services;
 
-import edu.ttu.retaileye.entities.Incident;
+import edu.ttu.retaileye.dtos.IncidentDto;
+import edu.ttu.retaileye.dtos.ManagerDto;
+import edu.ttu.retaileye.dtos.RecordingDto;
 import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.IncidentRepository;
@@ -9,43 +11,52 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class IncidentServiceImpl implements IService<Incident, UUID> {
+public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
 
     private final IncidentRepository incidentRepository;
 
     @Override
-    public Incident add(Incident incident) {
-        log.info("Adding new Incident: {}", incident);
+    public IncidentDto add(IncidentDto incidentDto) {
+        log.info("Adding new Incident: {}", incidentDto);
+
+        var errorMessage = "Error adding Incident";
+
         try {
-            return incidentRepository.save(incident);
+            var incident = IncidentDto.toEntity(incidentDto);
+            return Optional.of(incidentRepository.save(incident))
+                    .map(IncidentDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error adding Incident";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
 
     @Override
-    public Incident update(Incident incident) {
-        log.info("Updating Incident: {}", incident);
-        var existingIncident = incidentRepository.findById(incident.getId())
+    public IncidentDto update(IncidentDto incidentDto) {
+        log.info("Updating Incident: {}", incidentDto);
+        var existingIncident = incidentRepository.findById(incidentDto.getId())
                 .orElseThrow(() -> new NotFoundException("Incident not found"));
 
+        var errorMessage = "Error updating Incident";
+
         try {
-            existingIncident.setDescription(incident.getDescription());
-            existingIncident.setStatus(incident.getStatus());
-            existingIncident.setManager(incident.getManager());
-            existingIncident.setRecording(incident.getRecording());
-            existingIncident.setSeverity(incident.getSeverity());
-            existingIncident.setOccurrenceTime(incident.getOccurrenceTime());
-            return incidentRepository.save(existingIncident);
+            existingIncident.setDescription(incidentDto.getDescription());
+            existingIncident.setStatus(incidentDto.getStatus());
+            existingIncident.setManager(ManagerDto.toEntity(incidentDto.getManagerDto()));
+            existingIncident.setRecording(RecordingDto.toEntity(incidentDto.getRecordingDto()));
+            existingIncident.setSeverity(incidentDto.getSeverity());
+            existingIncident.setOccurrenceTime(incidentDto.getOccurrenceTime());
+            return Optional.of(incidentRepository.save(existingIncident))
+                    .map(IncidentDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error updating Incident";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
@@ -68,15 +79,19 @@ public class IncidentServiceImpl implements IService<Incident, UUID> {
     }
 
     @Override
-    public Incident getById(UUID id) {
+    public IncidentDto getById(UUID id) {
         log.info("Getting Incident by ID: {}", id);
         return incidentRepository.findById(id)
+                .map(IncidentDto::fromEntity)
                 .orElseThrow(() -> new NotFoundException("Incident not found with ID: " + id));
     }
 
     @Override
-    public List<Incident> getAll() {
+    public List<IncidentDto> getAll() {
         log.info("Getting all Incidents");
-        return incidentRepository.findAll();
+        return incidentRepository.findAll()
+                .stream()
+                .map(IncidentDto::fromEntity)
+                .toList();
     }
 }

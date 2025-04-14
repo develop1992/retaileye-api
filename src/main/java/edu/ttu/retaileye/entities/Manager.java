@@ -1,36 +1,43 @@
 package edu.ttu.retaileye.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.GenerationType;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import lombok.ToString;
-import lombok.RequiredArgsConstructor;
+import lombok.Builder;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Objects;
 import java.util.UUID;
 
+@Table(name = "managers")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
 @Getter
 @Setter
 @ToString
+@Builder
 public class Manager {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "uuid DEFAULT gen_random_uuid()")
     private UUID id;
 
     @OneToMany(mappedBy = "manager")
     @ToString.Exclude
-    private List<Incident> incidents;
+    private Set<Incident> incidents;
 
     private String firstName;
     private String middleName;

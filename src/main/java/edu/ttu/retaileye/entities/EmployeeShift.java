@@ -1,10 +1,14 @@
 package edu.ttu.retaileye.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.GenerationType;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
@@ -13,10 +17,11 @@ import lombok.ToString;
 import lombok.Builder;
 import org.hibernate.proxy.HibernateProxy;
 
-import java.util.List;
+import java.util.Set;
 import java.util.Objects;
 import java.util.UUID;
 
+@Table(name = "emplyoees_shifts")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
@@ -27,7 +32,8 @@ import java.util.UUID;
 public class EmployeeShift {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, updatable = false, columnDefinition = "uuid DEFAULT gen_random_uuid()")
     private UUID id;
 
     @ManyToOne
@@ -38,7 +44,7 @@ public class EmployeeShift {
 
     @OneToMany(mappedBy = "employeeShift")
     @ToString.Exclude
-    private List<Recording> recordings;
+    private Set<Recording> recordings;
 
     @Override
     public final boolean equals(Object o) {

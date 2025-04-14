@@ -1,6 +1,8 @@
 package edu.ttu.retaileye.services;
 
-import edu.ttu.retaileye.entities.Recording;
+import edu.ttu.retaileye.dtos.BodyCameraDto;
+import edu.ttu.retaileye.dtos.EmployeeShiftDto;
+import edu.ttu.retaileye.dtos.RecordingDto;
 import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.RecordingRepository;
@@ -9,43 +11,52 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class RecordingServiceImpl implements IService<Recording, UUID> {
+public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
 
     private final RecordingRepository recordingRepository;
 
     @Override
-    public Recording add(Recording recording) {
-        log.info("Adding new Recording: {}", recording);
+    public RecordingDto add(RecordingDto recordingDto) {
+        log.info("Adding new Recording: {}", recordingDto);
+
+        var errorMessage = "Error adding Recording";
+
         try {
-            return recordingRepository.save(recording);
+            var recording = RecordingDto.toEntity(recordingDto);
+            return Optional.of(recordingRepository.save(recording))
+                    .map(RecordingDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error adding Recording";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
 
     @Override
-    public Recording update(Recording recording) {
-        log.info("Updating Recording: {}", recording);
-        var existingRecording = recordingRepository.findById(recording.getId())
+    public RecordingDto update(RecordingDto recordingDto) {
+        log.info("Updating Recording: {}", recordingDto);
+        var existingRecording = recordingRepository.findById(recordingDto.getId())
                 .orElseThrow(() -> new NotFoundException("Recording not found"));
 
+        var errorMessage = "Error updating Recording";
+
         try {
-            existingRecording.setFilePath(recording.getFilePath());
-            existingRecording.setBodyCamera(recording.getBodyCamera());
-            existingRecording.setEmployeeShift(recording.getEmployeeShift());
-            existingRecording.setStartTime(recording.getStartTime());
-            existingRecording.setIncidents(recording.getIncidents());
-            existingRecording.setEndTime(recording.getEndTime());
-            return recordingRepository.save(existingRecording);
+            existingRecording.setFilePath(recordingDto.getFilePath());
+            existingRecording.setFileName(recordingDto.getFileName());
+            existingRecording.setBodyCamera(BodyCameraDto.toEntity(recordingDto.getBodyCameraDto()));
+            existingRecording.setEmployeeShift(EmployeeShiftDto.toEntity(recordingDto.getEmployeeShiftDto()));
+            existingRecording.setStartTime(recordingDto.getStartTime());
+            existingRecording.setEndTime(recordingDto.getEndTime());
+            return Optional.of(recordingRepository.save(existingRecording))
+                    .map(RecordingDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error updating Recording";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
@@ -68,15 +79,19 @@ public class RecordingServiceImpl implements IService<Recording, UUID> {
     }
 
     @Override
-    public Recording getById(UUID id) {
+    public RecordingDto getById(UUID id) {
         log.info("Getting Recording by ID: {}", id);
         return recordingRepository.findById(id)
+                .map(RecordingDto::fromEntity)
                 .orElseThrow(() -> new NotFoundException("Recording not found with ID: " + id));
     }
 
     @Override
-    public List<Recording> getAll() {
+    public List<RecordingDto> getAll() {
         log.info("Getting all Recordings");
-        return recordingRepository.findAll();
+        return recordingRepository.findAll()
+                .stream()
+                .map(RecordingDto::fromEntity)
+                .toList();
     }
 }

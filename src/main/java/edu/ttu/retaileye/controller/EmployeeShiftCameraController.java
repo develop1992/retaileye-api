@@ -1,7 +1,6 @@
 package edu.ttu.retaileye.controller;
 
-import edu.ttu.retaileye.records.EmployeeShiftCameraRequest;
-import edu.ttu.retaileye.entities.EmployeeShiftCamera;
+import edu.ttu.retaileye.dtos.EmployeeShiftCameraDto;
 import edu.ttu.retaileye.services.EmployeeShiftCameraServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -12,7 +11,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/retaileye/employeeshiftcamera")
+@RequestMapping("/retaileye/employees-shifts-cameras")
 public class EmployeeShiftCameraController {
 
     private final EmployeeShiftCameraServiceImpl employeeShiftCameraService;
@@ -20,12 +19,12 @@ public class EmployeeShiftCameraController {
     /**
      * Assign a body camera to an employee shift.
      *
-     * @param assignmentRequest the assignment request containing the employee shift ID and body camera ID
-     * @return the assigned EmployeeShiftCamera object
+     * @param employeeShiftCameraDto the EmployeeShiftCameraDto object containing the assignment details
+     * @return a ResponseEntity with the created EmployeeShiftCameraDto
      */
     @PostMapping
-    public ResponseEntity<EmployeeShiftCamera> assignTo(@RequestBody EmployeeShiftCameraRequest assignmentRequest) {
-        var result = employeeShiftCameraService.assignTo(assignmentRequest.employeeShiftId(), assignmentRequest.bodyCameraId());
+    public ResponseEntity<EmployeeShiftCameraDto> assignTo(@RequestBody EmployeeShiftCameraDto employeeShiftCameraDto) {
+        var result = employeeShiftCameraService.assignTo(employeeShiftCameraDto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
@@ -48,8 +47,8 @@ public class EmployeeShiftCameraController {
      * @return the EmployeeShiftCamera object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeShiftCamera> getById(@PathVariable UUID id) {
-        var employeeShiftCamera = employeeShiftCameraService.getById(id);
-        return new ResponseEntity<>(employeeShiftCamera, HttpStatus.OK);
+    public ResponseEntity<EmployeeShiftCameraDto> getById(@PathVariable UUID id) {
+        var employeeShiftCameraDto = employeeShiftCameraService.getById(id);
+        return new ResponseEntity<>(employeeShiftCameraDto, HttpStatus.OK);
     }
 }

@@ -1,6 +1,6 @@
 package edu.ttu.retaileye.services;
 
-import edu.ttu.retaileye.entities.Shift;
+import edu.ttu.retaileye.dtos.ShiftDto;
 import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.ShiftRepository;
@@ -9,40 +9,50 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ShiftServiceImpl implements IService<Shift, UUID> {
+public class ShiftServiceImpl implements IService<ShiftDto, UUID> {
 
     private final ShiftRepository shiftRepository;
 
     @Override
-    public Shift add(Shift shift) {
-        log.info("Adding new Shift: {}", shift);
+    public ShiftDto add(ShiftDto shiftDto) {
+        log.info("Adding new Shift: {}", shiftDto);
+
+        var errorMessage = "Error adding Shift";
+
         try {
-            return shiftRepository.save(shift);
+            var shift = ShiftDto.toEntity(shiftDto);
+            return Optional.of(shiftRepository.save(shift))
+                    .map(ShiftDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error adding Shift";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
 
     @Override
-    public Shift update(Shift shift) {
-        log.info("Updating Shift: {}", shift);
-        var existingShift = shiftRepository.findById(shift.getId())
+    public ShiftDto update(ShiftDto shiftDto) {
+        log.info("Updating Shift: {}", shiftDto);
+        var existingShift = shiftRepository.findById(shiftDto.getId())
                 .orElseThrow(() -> new NotFoundException("Shift not found"));
 
+        var errorMessage = "Error updating Shift";
+
         try {
-            existingShift.setStartTime(shift.getStartTime());
-            existingShift.setEndTime(shift.getEndTime());
-            existingShift.setEmployees(shift.getEmployees());
-            return shiftRepository.save(existingShift);
+            existingShift.setStartTime(shiftDto.getStartTime());
+            existingShift.setEndTime(shiftDto.getEndTime());
+            existingShift.setType(shiftDto.getType());
+            existingShift.setAvailable(shiftDto.isAvailable());
+            return Optional.of(shiftRepository.save(existingShift))
+                    .map(ShiftDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error updating Shift";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
@@ -65,15 +75,19 @@ public class ShiftServiceImpl implements IService<Shift, UUID> {
     }
 
     @Override
-    public Shift getById(UUID id) {
+    public ShiftDto getById(UUID id) {
         log.info("Getting Shift with ID: {}", id);
         return shiftRepository.findById(id)
+                .map(ShiftDto::fromEntity)
                 .orElseThrow(() -> new NotFoundException("Shift not found with ID: " + id));
     }
 
     @Override
-    public List<Shift> getAll() {
+    public List<ShiftDto> getAll() {
         log.info("Getting all Shifts");
-        return shiftRepository.findAll();
+        return shiftRepository.findAll()
+                .stream()
+                .map(ShiftDto::fromEntity)
+                .toList();
     }
 }

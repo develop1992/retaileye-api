@@ -1,7 +1,6 @@
 package edu.ttu.retaileye.controller;
 
-import edu.ttu.retaileye.records.EmployeeShiftRequest;
-import edu.ttu.retaileye.entities.EmployeeShift;
+import edu.ttu.retaileye.dtos.EmployeeShiftDto;
 import edu.ttu.retaileye.services.EmployeeShiftServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,7 @@ import java.util.UUID;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/retaileye/employeeshift")
+@RequestMapping("/retaileye/employees-shifts")
 public class EmployeeShiftController {
 
     private final EmployeeShiftServiceImpl employeeShiftService;
@@ -26,12 +25,12 @@ public class EmployeeShiftController {
     /**
      * Assign an employee to a shift.
      *
-     * @param employeeShiftRequest the request containing the employee ID and shift ID
-     * @return the assigned EmployeeShift object
+     * @param employeeShiftDto the EmployeeShiftDto object containing the assignment details
+     * @return a ResponseEntity with the created EmployeeShift
      */
     @PostMapping
-    public ResponseEntity<EmployeeShift> assignTo(@RequestBody EmployeeShiftRequest employeeShiftRequest) {
-        var result = employeeShiftService.assignTo(employeeShiftRequest.employeeId(), employeeShiftRequest.shiftId());
+    public ResponseEntity<EmployeeShiftDto> assignTo(@RequestBody EmployeeShiftDto employeeShiftDto) {
+        var result = employeeShiftService.assignTo(employeeShiftDto);
         return new ResponseEntity<>(result, HttpStatus.CREATED);
     }
 
@@ -54,8 +53,8 @@ public class EmployeeShiftController {
      * @return the EmployeeShift object
      */
     @GetMapping("/{id}")
-    public ResponseEntity<EmployeeShift> getById(@PathVariable UUID id) {
-        var employeeShift = employeeShiftService.getById(id);
-        return new ResponseEntity<>(employeeShift, HttpStatus.OK);
+    public ResponseEntity<EmployeeShiftDto> getById(@PathVariable UUID id) {
+        var employeeShiftDto = employeeShiftService.getById(id);
+        return new ResponseEntity<>(employeeShiftDto, HttpStatus.OK);
     }
 }

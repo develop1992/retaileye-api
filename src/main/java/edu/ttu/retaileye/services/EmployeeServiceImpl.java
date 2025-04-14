@@ -1,6 +1,6 @@
 package edu.ttu.retaileye.services;
 
-import edu.ttu.retaileye.entities.Employee;
+import edu.ttu.retaileye.dtos.EmployeeDto;
 import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.EmployeeRepository;
@@ -9,45 +9,53 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class EmployeeServiceImpl implements IService<Employee, UUID> {
+public class EmployeeServiceImpl implements IService<EmployeeDto, UUID> {
 
     private final EmployeeRepository employeeRepository;
 
     @Override
-    public Employee add(Employee employee) {
-        log.info("Adding new Employee: {}", employee);
+    public EmployeeDto add(EmployeeDto employeeDto) {
+        log.info("Adding new Employee: {}", employeeDto);
+
+        var errorMessage = "Error adding Employee";
+
         try {
-            return employeeRepository.save(employee);
+            var employee = EmployeeDto.toEntity(employeeDto);
+            return Optional.of(employeeRepository.save(employee))
+                    .map(EmployeeDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error adding Employee";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
 
     @Override
-    public Employee update(Employee employee) {
-        log.info("Updating Employee: {}", employee);
-        var existingEmployee = employeeRepository.findById(employee.getId())
+    public EmployeeDto update(EmployeeDto employeeDto) {
+        log.info("Updating Employee: {}", employeeDto);
+        var existingEmployee = employeeRepository.findById(employeeDto.getId())
                 .orElseThrow(() -> new NotFoundException("Employee not found"));
 
+        var errorMessage = "Error updating Employee";
+
         try {
-            existingEmployee.setFirstName(employee.getFirstName());
-            existingEmployee.setMiddleName(employee.getMiddleName());
-            existingEmployee.setLastName(employee.getLastName());
-            existingEmployee.setEmail(employee.getEmail());
-            existingEmployee.setRole(employee.getRole());
-            existingEmployee.setAddress(employee.getAddress());
-            existingEmployee.setPhoneNumber(employee.getPhoneNumber());
-            existingEmployee.setShifts(employee.getShifts());
-            return employeeRepository.save(existingEmployee);
+            existingEmployee.setFirstName(employeeDto.getFirstName());
+            existingEmployee.setMiddleName(employeeDto.getMiddleName());
+            existingEmployee.setLastName(employeeDto.getLastName());
+            existingEmployee.setEmail(employeeDto.getEmail());
+            existingEmployee.setRole(employeeDto.getRole());
+            existingEmployee.setAddress(employeeDto.getAddress());
+            existingEmployee.setPhoneNumber(employeeDto.getPhoneNumber());
+            return Optional.of(employeeRepository.save(existingEmployee))
+                    .map(EmployeeDto::fromEntity)
+                    .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            var errorMessage = "Error updating Employee";
             log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
@@ -70,15 +78,19 @@ public class EmployeeServiceImpl implements IService<Employee, UUID> {
     }
 
     @Override
-    public Employee getById(UUID id) {
+    public EmployeeDto getById(UUID id) {
         log.info("Getting Employee by ID: {}", id);
         return employeeRepository.findById(id)
+                .map(EmployeeDto::fromEntity)
                 .orElseThrow(() -> new NotFoundException("Employee not found with ID: " + id));
     }
 
     @Override
-    public List<Employee> getAll() {
+    public List<EmployeeDto> getAll() {
         log.info("Getting all Employees");
-        return employeeRepository.findAll();
+        return employeeRepository.findAll()
+                .stream()
+                .map(EmployeeDto::fromEntity)
+                .toList();
     }
 }

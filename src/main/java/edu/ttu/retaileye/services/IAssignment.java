@@ -2,13 +2,12 @@ package edu.ttu.retaileye.services;
 
 public interface IAssignment<E, ID> {
     /**
-     * Assigns an entity to a specific ID.
+     * Assigns an entity to another entity.
      *
-     * @param assigneeId the ID of the assignee
-     * @param assignmentId the ID of the assignment
+     * @param entity the entity to assign
      * @return the assigned entity
      */
-    E assignTo(ID assigneeId, ID assignmentId);
+    E assignTo(E entity);
 
     /**
      * Removes an entity by its ID.
