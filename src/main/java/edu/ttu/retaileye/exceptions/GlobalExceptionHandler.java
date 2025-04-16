@@ -3,6 +3,7 @@ package edu.ttu.retaileye.exceptions;
 import edu.ttu.retaileye.records.ApiError;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,7 +31,10 @@ public class GlobalExceptionHandler {
                         .path(request.getRequestURI())
                         .build();
 
-        return ResponseEntity.status(status).body(error);
+        return ResponseEntity
+                .status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(error);
     }
 
     /**
@@ -52,7 +56,10 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(status).body(error);
+        return ResponseEntity
+                .status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(error);
     }
 
     /**
@@ -74,6 +81,9 @@ public class GlobalExceptionHandler {
                 .path(request.getRequestURI())
                 .build();
 
-        return ResponseEntity.status(status).body(error);
+        return ResponseEntity
+                .status(status)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(error);
     }
 }

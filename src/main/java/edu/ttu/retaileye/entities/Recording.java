@@ -49,6 +49,8 @@ public class Recording {
 
     private String filePath;
     private String fileName;
+    private String fileType;
+    private String fileSize;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
 

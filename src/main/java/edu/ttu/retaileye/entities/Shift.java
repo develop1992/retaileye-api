@@ -40,7 +40,7 @@ public class Shift {
     @ToString.Exclude
     private Set<EmployeeShift> employees;
 
-    private boolean isAvailable;
+    private Boolean isAvailable;
     private String type;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

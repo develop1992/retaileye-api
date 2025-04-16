@@ -15,6 +15,8 @@ public class RecordingDto {
     private UUID id;
     private String filePath;
     private String fileName;
+    private String fileType;
+    private String fileSize;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private EmployeeShiftDto employeeShiftDto;
@@ -29,6 +31,8 @@ public class RecordingDto {
                 .id(recording.getId())
                 .filePath(recording.getFilePath())
                 .fileName(recording.getFileName())
+                .fileType(recording.getFileType())
+                .fileSize(recording.getFileSize())
                 .startTime(recording.getStartTime())
                 .endTime(recording.getEndTime())
                 .employeeShiftDto(EmployeeShiftDto.fromEntity(recording.getEmployeeShift()))
@@ -44,6 +48,8 @@ public class RecordingDto {
         return Recording.builder()
                 .filePath(recordingDto.getFilePath())
                 .fileName(recordingDto.getFileName())
+                .fileType(recordingDto.getFileType())
+                .fileSize(recordingDto.getFileSize())
                 .startTime(recordingDto.getStartTime())
                 .endTime(recordingDto.getEndTime())
                 .employeeShift(EmployeeShiftDto.toEntity(recordingDto.getEmployeeShiftDto()))

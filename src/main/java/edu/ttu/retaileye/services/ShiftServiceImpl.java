@@ -48,7 +48,7 @@ public class ShiftServiceImpl implements IService<ShiftDto, UUID> {
             existingShift.setStartTime(shiftDto.getStartTime());
             existingShift.setEndTime(shiftDto.getEndTime());
             existingShift.setType(shiftDto.getType());
-            existingShift.setAvailable(shiftDto.isAvailable());
+            existingShift.setIsAvailable(shiftDto.getIsAvailable());
             return Optional.of(shiftRepository.save(existingShift))
                     .map(ShiftDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));

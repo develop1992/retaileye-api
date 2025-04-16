@@ -49,6 +49,8 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
         try {
             existingRecording.setFilePath(recordingDto.getFilePath());
             existingRecording.setFileName(recordingDto.getFileName());
+            existingRecording.setFileType(recordingDto.getFileType());
+            existingRecording.setFileSize(recordingDto.getFileSize());
             existingRecording.setBodyCamera(BodyCameraDto.toEntity(recordingDto.getBodyCameraDto()));
             existingRecording.setEmployeeShift(EmployeeShiftDto.toEntity(recordingDto.getEmployeeShiftDto()));
             existingRecording.setStartTime(recordingDto.getStartTime());

@@ -13,7 +13,7 @@ import java.util.UUID;
 @Builder
 public class ShiftDto {
     private UUID id;
-    private boolean isAvailable;
+    private Boolean isAvailable;
     private String type;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
@@ -25,7 +25,7 @@ public class ShiftDto {
 
         return ShiftDto.builder()
                 .id(shift.getId())
-                .isAvailable(shift.isAvailable())
+                .isAvailable(shift.getIsAvailable())
                 .type(shift.getType())
                 .startTime(shift.getStartTime())
                 .endTime(shift.getEndTime())
@@ -38,7 +38,7 @@ public class ShiftDto {
         }
 
         return Shift.builder()
-                .isAvailable(shiftDto.isAvailable())
+                .isAvailable(shiftDto.getIsAvailable())
                 .type(shiftDto.getType())
                 .startTime(shiftDto.getStartTime())
                 .endTime(shiftDto.getEndTime())
