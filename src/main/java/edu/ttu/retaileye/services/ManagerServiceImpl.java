@@ -31,7 +31,6 @@ public class ManagerServiceImpl implements IService<ManagerDto, UUID> {
                     .map(ManagerDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -55,7 +54,6 @@ public class ManagerServiceImpl implements IService<ManagerDto, UUID> {
                     .map(ManagerDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -70,9 +68,7 @@ public class ManagerServiceImpl implements IService<ManagerDto, UUID> {
         try {
             managerRepository.delete(manager);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing Manager with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing Manager with ID: %s", id), e);
         }
     }
 

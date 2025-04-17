@@ -3,6 +3,7 @@ package edu.ttu.retaileye.services;
 import edu.ttu.retaileye.dtos.IncidentDto;
 import edu.ttu.retaileye.dtos.ManagerDto;
 import edu.ttu.retaileye.dtos.RecordingDto;
+import edu.ttu.retaileye.entities.Incident;
 import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.IncidentRepository;
@@ -21,6 +22,24 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
 
     private final IncidentRepository incidentRepository;
 
+    /**
+     * Adds a list of incidents to the database.
+     *
+     * @param incidentDtoList the list of incidents to add
+     * @return the list of added incidents
+     */
+    public List<IncidentDto> addAll(List<IncidentDto> incidentDtoList) {
+        List<Incident> incidents = incidentDtoList.stream()
+                .map(IncidentDto::toEntity)
+                .toList();
+
+        List<Incident> saved = incidentRepository.saveAll(incidents);
+
+        return saved.stream()
+                .map(IncidentDto::fromEntity)
+                .toList();
+    }
+
     @Override
     public IncidentDto add(IncidentDto incidentDto) {
         log.info("Adding new Incident: {}", incidentDto);
@@ -33,7 +52,6 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
                     .map(IncidentDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -57,7 +75,6 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
                     .map(IncidentDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -72,10 +89,13 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
         try {
             incidentRepository.delete(incident);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing Incident with ID: %" + id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing Incident with ID: %" + id), e);
         }
+    }
+
+    public void removeAll() {
+        log.info("Removing all Incidents");
+        incidentRepository.deleteAll();
     }
 
     @Override

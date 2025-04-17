@@ -4,6 +4,7 @@ import edu.ttu.retaileye.dtos.EmployeeDto;
 import edu.ttu.retaileye.dtos.EmployeeShiftDto;
 import edu.ttu.retaileye.dtos.ShiftDto;
 import edu.ttu.retaileye.entities.EmployeeShift;
+import edu.ttu.retaileye.exceptions.InternalException;
 import edu.ttu.retaileye.exceptions.NotFoundException;
 import edu.ttu.retaileye.repositories.EmployeeShiftRepository;
 import lombok.RequiredArgsConstructor;
@@ -38,8 +39,7 @@ public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShiftDto, U
                     .map(EmployeeShiftDto::fromEntity)
                     .orElseThrow(() -> new NotFoundException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
-            throw new RuntimeException(errorMessage, e);
+            throw new InternalException(errorMessage, e);
         }
     }
 
@@ -53,9 +53,7 @@ public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShiftDto, U
         try {
             employeeShiftRepository.delete(employeeShift);
         } catch (Exception e) {
-            var errorMessage = String.format("Error unassigning employee shift with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new RuntimeException(errorMessage, e);
+            throw new InternalException(String.format("Error unassigning employee shift with ID: %s", id), e);
         }
     }
 

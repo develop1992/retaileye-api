@@ -31,7 +31,6 @@ public class BodyCameraServiceImpl implements IService<BodyCameraDto, UUID> {
                     .map(BodyCameraDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -54,7 +53,6 @@ public class BodyCameraServiceImpl implements IService<BodyCameraDto, UUID> {
                     .map(BodyCameraDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -69,9 +67,7 @@ public class BodyCameraServiceImpl implements IService<BodyCameraDto, UUID> {
         try {
             bodyCameraRepository.delete(bodyCamera);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing BodyCamera with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing BodyCamera with ID: %s", id), e);
         }
     }
 

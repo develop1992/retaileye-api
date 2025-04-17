@@ -58,7 +58,6 @@ public class EmployeeShiftCameraServiceImpl implements IAssignment<EmployeeShift
                     .map(EmployeeShiftCameraDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -73,9 +72,7 @@ public class EmployeeShiftCameraServiceImpl implements IAssignment<EmployeeShift
         try {
             employeeShiftCameraRepository.delete(employeeShiftCamera);
         } catch (Exception e) {
-            var errorMessage = String.format("Error unassigning body camera from employee shift camera with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error unassigning body camera from employee shift camera with ID: %s", id), e);
         }
     }
 

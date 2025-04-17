@@ -31,7 +31,6 @@ public class ShiftServiceImpl implements IService<ShiftDto, UUID> {
                     .map(ShiftDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -53,7 +52,6 @@ public class ShiftServiceImpl implements IService<ShiftDto, UUID> {
                     .map(ShiftDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -68,9 +66,7 @@ public class ShiftServiceImpl implements IService<ShiftDto, UUID> {
         try {
             shiftRepository.delete(shift);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing Shift with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing Shift with ID: %s", id), e);
         }
     }
 

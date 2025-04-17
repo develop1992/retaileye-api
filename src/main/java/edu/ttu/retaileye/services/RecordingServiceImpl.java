@@ -1,5 +1,6 @@
 package edu.ttu.retaileye.services;
 
+import edu.ttu.retaileye.ai.VideoAnalysisService;
 import edu.ttu.retaileye.dtos.BodyCameraDto;
 import edu.ttu.retaileye.dtos.EmployeeShiftDto;
 import edu.ttu.retaileye.dtos.RecordingDto;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -20,6 +22,7 @@ import java.util.UUID;
 public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
 
     private final RecordingRepository recordingRepository;
+    private final VideoAnalysisService videoAnalysisService;
 
     @Override
     public RecordingDto add(RecordingDto recordingDto) {
@@ -31,9 +34,12 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
             var recording = RecordingDto.toEntity(recordingDto);
             return Optional.of(recordingRepository.save(recording))
                     .map(RecordingDto::fromEntity)
+                    .map(recDto -> {
+                        videoAnalysisService.analyzeVideo(recDto.getFilePath());
+                        return recDto;
+                    })
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -59,7 +65,6 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
                     .map(RecordingDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -72,11 +77,19 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
                 .orElseThrow(() -> new NotFoundException("Recording not found with ID: " + id));
 
         try {
+//            // Delete the actual file from disk
+//            var path = recording.getFilePath();
+//            var file = new File(path);
+//            if (file.exists() && file.isFile()) {
+//                boolean deleted = file.delete();
+//                if (!deleted) {
+//                    log.warn("Failed to delete video file: {}", path);
+//                }
+//            }
+
             recordingRepository.delete(recording);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing Recording with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing Recording with ID: %s", id), e);
         }
     }
 

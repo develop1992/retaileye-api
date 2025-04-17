@@ -31,7 +31,6 @@ public class EmployeeServiceImpl implements IService<EmployeeDto, UUID> {
                     .map(EmployeeDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -56,7 +55,6 @@ public class EmployeeServiceImpl implements IService<EmployeeDto, UUID> {
                     .map(EmployeeDto::fromEntity)
                     .orElseThrow(() -> new InternalException(errorMessage));
         } catch (Exception e) {
-            log.error(errorMessage, e);
             throw new InternalException(errorMessage, e);
         }
     }
@@ -71,9 +69,7 @@ public class EmployeeServiceImpl implements IService<EmployeeDto, UUID> {
         try {
             employeeRepository.delete(employee);
         } catch (Exception e) {
-            var errorMessage = String.format("Error removing Employee with ID: %s", id);
-            log.error(errorMessage, e);
-            throw new InternalException(errorMessage, e);
+            throw new InternalException(String.format("Error removing Employee with ID: %s", id), e);
         }
     }
 
