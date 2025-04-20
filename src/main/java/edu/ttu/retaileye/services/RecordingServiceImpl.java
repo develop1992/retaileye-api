@@ -35,7 +35,7 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
             return Optional.of(recordingRepository.save(recording))
                     .map(RecordingDto::fromEntity)
                     .map(recDto -> {
-                        videoAnalysisService.analyzeVideo(recDto.getFilePath());
+                        videoAnalysisService.analyzeVideo(recDto.getFileName());
                         return recDto;
                     })
                     .orElseThrow(() -> new InternalException(errorMessage));

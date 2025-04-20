@@ -1,31 +1,41 @@
 package edu.ttu.retaileye.ai;
 
 import edu.ttu.retaileye.exceptions.InternalException;
+import edu.ttu.retaileye.records.AnalyzeVideoRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
+import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@RequiredArgsConstructor
 @Slf4j
 public class VideoAnalysisService {
 
-    public void analyzeVideo(String filePath) {
+    private final WebClient.Builder webClientBuilder;
+
+    @Value("${ai.api.base-url}")
+    private String aiBaseUrl;
+
+    public void analyzeVideo(String fileName) {
         try {
-            log.info("Triggering motion detection for file: {}", filePath);
+            log.info("Sending request to AI service for file: {}", fileName);
 
-            ProcessBuilder pb = new ProcessBuilder(
-                    "C:\\Users\\bahra\\OneDrive\\Desktop\\School\\CS 4366\\retaileye-ai\\.venv\\Scripts\\python.exe",
-                "C:/Users/bahra/OneDrive/Desktop/School/CS 4366/retaileye-ai/main.py",
-                    filePath
-            );
+            webClientBuilder.build()
+                    .post()
+                    .uri(aiBaseUrl + "/analyze-video")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(new AnalyzeVideoRequest(fileName))
+                    .retrieve()
+                    .bodyToMono(Void.class)
+                    .doOnSuccess(response -> log.info("Video analysis request sent successfully"))
+                    .doOnError(err -> log.error("AI service call failed: {}", err.getMessage()))
+                    .block(); // Blocking for simplicity, will consider using reactive patterns in production
 
-            pb.redirectErrorStream(true);
-            pb.inheritIO(); // prints Python output to console
-            pb.start();
-
-        } catch (IOException e) {
-            throw new InternalException("Error running motion detection", e);
+        } catch (Exception e) {
+            throw new InternalException("Failed to call AI service", e);
         }
     }
 }

@@ -18,3 +18,7 @@ spring:
         format_sql: true
         use_sql_comments: true
     open-in-view: false
+
+ai:
+  api:
+    base-url: https://retaileye.ngrok.io/ai
