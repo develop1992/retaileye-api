@@ -20,7 +20,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "emplyoees_shifts_cameras")
+@Table(name = "employees_shifts_cameras")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor

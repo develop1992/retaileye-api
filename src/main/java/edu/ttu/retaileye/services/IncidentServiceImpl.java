@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
 public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
 
     private final IncidentRepository incidentRepository;
+    private final RecordingServiceImpl recordingService;
 
     /**
      * Adds a list of incidents to the database.
@@ -29,13 +31,25 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
      * @return the list of added incidents
      */
     public List<IncidentDto> addAll(List<IncidentDto> incidentDtoList) {
-        List<Incident> incidents = incidentDtoList.stream()
-                .map(IncidentDto::toEntity)
-                .toList();
+        log.info("Adding {} Incidents", incidentDtoList.size());
 
-        List<Incident> saved = incidentRepository.saveAll(incidents);
+        var incidents = new ArrayList<Incident>();
 
-        return saved.stream()
+        for (IncidentDto incidentDto : incidentDtoList) {
+            var incident = IncidentDto.toEntity(incidentDto);
+
+            // Fetch the managed Recording entity and attach it
+            if (incidentDto.getRecordingDto() != null && incidentDto.getRecordingDto().getId() != null) {
+                var recording = RecordingDto.toEntity(recordingService.getById(incidentDto.getRecordingDto().getId()));
+                recording.setId(incidentDto.getRecordingDto().getId());
+                incident.setRecording(recording);
+            }
+
+            incidents.add(incident);
+        }
+
+        return incidentRepository.saveAll(incidents)
+                .stream()
                 .map(IncidentDto::fromEntity)
                 .toList();
     }

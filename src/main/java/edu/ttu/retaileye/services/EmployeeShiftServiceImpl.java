@@ -20,19 +20,27 @@ import java.util.UUID;
 public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShiftDto, UUID> {
 
     private final EmployeeShiftRepository employeeShiftRepository;
+    private final EmployeeServiceImpl employeeService;
+    private final ShiftServiceImpl shiftService;
 
     @Override
     public EmployeeShiftDto assignTo(EmployeeShiftDto employeeShiftDto) {
-        var employee = EmployeeDto.toEntity(employeeShiftDto.getEmployeeDto());
-        var shift = ShiftDto.toEntity(employeeShiftDto.getShiftDto());
-        log.info("Assigning employee with ID {} to shift with ID {}", employee.getId(), shift.getId());
+        var employeeId = employeeShiftDto.getEmployeeDto().getId();
+        var employee = EmployeeDto.toEntity(employeeService.getById(employeeId));
+        employee.setId(employeeId);
+
+        var shiftId = employeeShiftDto.getShiftDto().getId();
+        var shift = ShiftDto.toEntity(shiftService.getById(shiftId));
+        shift.setId(shiftId);
+
+        log.info("Assigning employee with ID {} to shift with ID {}", employeeId, shiftId);
 
         var employeeShift = EmployeeShift.builder()
                 .employee(employee)
                 .shift(shift)
                 .build();
 
-        var errorMessage = String.format("Error assigning employee with ID %s to shift with ID %s", employee.getId(), shift.getId());
+        var errorMessage = String.format("Error assigning employee with ID %s to shift with ID %s", employeeId, shiftId);
 
         try {
             return Optional.of(employeeShiftRepository.save(employeeShift))
@@ -58,6 +66,13 @@ public class EmployeeShiftServiceImpl implements IAssignment<EmployeeShiftDto, U
     }
 
     @Override
+    public EmployeeShiftDto getByEmployeeId(UUID id) {
+        log.info("Finding employee shift with employee ID {}", id);
+        return employeeShiftRepository.findByEmployeeId(id)
+                .map(EmployeeShiftDto::fromEntity)
+                .orElseThrow(() -> new NotFoundException("Employee shift not found with employee ID: " + id));
+    }
+
     public EmployeeShiftDto getById(UUID id) {
         log.info("Finding employee shift with ID {}", id);
         return employeeShiftRepository.findById(id)

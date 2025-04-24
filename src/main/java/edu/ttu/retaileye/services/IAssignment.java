@@ -17,10 +17,9 @@ public interface IAssignment<E, ID> {
     void remove(ID id);
 
     /**
-     * Retrieves an entity by its ID.
-     *
-     * @param id the ID of the entity to retrieve
-     * @return the entity with the specified ID
+     * Retrieves an entity by its employee ID.
+     * @param id the employee ID to search for
+     * @return the entity associated with the specified employee ID
      */
-    E getById(ID id);
+    E getByEmployeeId(ID id);
 }

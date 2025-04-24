@@ -11,5 +11,5 @@ import java.util.UUID;
 
 @Repository
 public interface EmployeeShiftRepository extends JpaRepository<EmployeeShift, UUID> {
-    // Custom query methods can be defined here if needed
+    Optional<EmployeeShift> findByEmployeeId(UUID employeeId);
 }

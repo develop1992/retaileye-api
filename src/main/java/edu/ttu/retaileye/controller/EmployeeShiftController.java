@@ -47,14 +47,14 @@ public class EmployeeShiftController {
     }
 
     /**
-     * Get an EmployeeShift by its ID.
+     * Get an EmployeeShift by its employee ID.
      *
-     * @param id the ID of the EmployeeShift to retrieve
+     * @param id the employee ID of the EmployeeShift to retrieve
      * @return the EmployeeShift object
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeShiftDto> getById(@PathVariable UUID id) {
-        var employeeShiftDto = employeeShiftService.getById(id);
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<EmployeeShiftDto> getByEmployeeId(@PathVariable UUID id) {
+        var employeeShiftDto = employeeShiftService.getByEmployeeId(id);
         return new ResponseEntity<>(employeeShiftDto, HttpStatus.OK);
     }
 }

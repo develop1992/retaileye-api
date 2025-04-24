@@ -41,14 +41,14 @@ public class EmployeeShiftCameraController {
     }
 
     /**
-     * Get an EmployeeShiftCamera by its ID.
+     * Get an EmployeeShiftCamera by its employee ID.
      *
-     * @param id the ID of the EmployeeShiftCamera to retrieve
+     * @param id the employee ID of the EmployeeShiftCamera to retrieve
      * @return the EmployeeShiftCamera object
      */
-    @GetMapping("/{id}")
-    public ResponseEntity<EmployeeShiftCameraDto> getById(@PathVariable UUID id) {
-        var employeeShiftCameraDto = employeeShiftCameraService.getById(id);
+    @GetMapping("/employee/{id}")
+    public ResponseEntity<EmployeeShiftCameraDto> getByEmployeeId(@PathVariable UUID id) {
+        var employeeShiftCameraDto = employeeShiftCameraService.getByEmployeeId(id);
         return new ResponseEntity<>(employeeShiftCameraDto, HttpStatus.OK);
     }
 }

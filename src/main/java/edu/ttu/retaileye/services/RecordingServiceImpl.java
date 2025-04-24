@@ -11,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -23,6 +22,7 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
 
     private final RecordingRepository recordingRepository;
     private final VideoAnalysisService videoAnalysisService;
+    private final EmployeeShiftCameraServiceImpl employeeShiftCameraService;
 
     @Override
     public RecordingDto add(RecordingDto recordingDto) {
@@ -32,6 +32,17 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
 
         try {
             var recording = RecordingDto.toEntity(recordingDto);
+
+            if(recording.getBodyCamera() != null) {
+                var employeeShiftCamera = employeeShiftCameraService.getActiveAssignment(recording.getBodyCamera().getSerialNumber(), recording.getStartTime(), recording.getEndTime());
+                recording.setEmployeeShift(employeeShiftCamera.getEmployeeShift());
+                recording.setBodyCamera(employeeShiftCamera.getBodyCamera());
+
+                return Optional.of(recordingRepository.save(recording))
+                        .map(RecordingDto::fromEntity)
+                        .orElseThrow(() -> new InternalException(errorMessage));
+            }
+
             return Optional.of(recordingRepository.save(recording))
                     .map(RecordingDto::fromEntity)
                     .map(recDto -> {

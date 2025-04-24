@@ -31,7 +31,7 @@ public class RecordingController extends BaseController<RecordingDto, UUID> {
     @GetMapping("/view/{id}")
     public ResponseEntity<Resource> streamVideo(@PathVariable UUID id) throws IOException {
         var recording = recordingService.getById(id);
-        File file = new File(recording.getFilePath());
+        var file = new File(recording.getFilePath());
 
         if (!file.exists()) {
             throw new NotFoundException("File not found at: " + file.getAbsolutePath());

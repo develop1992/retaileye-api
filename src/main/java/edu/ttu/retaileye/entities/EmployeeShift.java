@@ -21,7 +21,7 @@ import java.util.Set;
 import java.util.Objects;
 import java.util.UUID;
 
-@Table(name = "emplyoees_shifts")
+@Table(name = "employees_shifts")
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
