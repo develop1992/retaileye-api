@@ -4,7 +4,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/retaileye
-    username: postgres
+    username: database_user
     password: database_password
     driver-class-name: org.postgresql.Driver
 
