@@ -23,6 +23,7 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
 
     private final IncidentRepository incidentRepository;
     private final RecordingServiceImpl recordingService;
+    private final EmailService emailService;
 
     /**
      * Adds a list of incidents to the database.
@@ -48,10 +49,16 @@ public class IncidentServiceImpl implements IService<IncidentDto, UUID> {
             incidents.add(incident);
         }
 
-        return incidentRepository.saveAll(incidents)
+        // Save incidents
+        var savedIncidents = incidentRepository.saveAll(incidents)
                 .stream()
                 .map(IncidentDto::fromEntity)
                 .toList();
+
+        // Send email notification to manager after incidents are saved
+        emailService.sendEmail(savedIncidents);
+
+        return savedIncidents;
     }
 
     @Override

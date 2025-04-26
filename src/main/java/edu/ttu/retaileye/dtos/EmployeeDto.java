@@ -1,6 +1,7 @@
 package edu.ttu.retaileye.dtos;
 
 import edu.ttu.retaileye.entities.Employee;
+import io.micrometer.common.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,5 +50,19 @@ public class EmployeeDto {
                     .address(employeeDto.getAddress())
                     .phoneNumber(employeeDto.getPhoneNumber())
                     .email(employeeDto.getEmail()).build();
+    }
+
+    public final String getFullName() {
+        String fullName = this.firstName;
+
+        if(!StringUtils.isBlank(this.middleName)) {
+            fullName += " " + this.middleName;
+        }
+
+        if(!StringUtils.isBlank(this.lastName)) {
+            fullName += " " + this.lastName;
+        }
+
+        return fullName.trim();
     }
 }

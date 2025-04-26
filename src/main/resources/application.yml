@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/retaileye
     username: postgres
-    password: Meow13@ismylove
+    password: database_password
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,6 +18,17 @@ spring:
         format_sql: true
         use_sql_comments: true
     open-in-view: false
+
+  mail:
+    host: smtp.mail.yahoo.com
+    port: 587
+    username: email_address
+    password: one_time_password
+    properties:
+      mail.smtp.auth: true
+      mail.smtp.starttls.enable: true
+      mail.smtp.ssl.enable: false
+      mail.debug: true
 
 ai:
   api:

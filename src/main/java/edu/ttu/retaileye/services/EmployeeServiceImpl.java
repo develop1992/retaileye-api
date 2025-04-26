@@ -89,4 +89,10 @@ public class EmployeeServiceImpl implements IService<EmployeeDto, UUID> {
                 .map(EmployeeDto::fromEntity)
                 .toList();
     }
+
+    public Optional<EmployeeDto> getByRole(String role) {
+        log.info("Getting Employee by role: {}", role);
+        return employeeRepository.findByRoleIgnoreCase(role)
+                .map(EmployeeDto::fromEntity);
+    }
 }
