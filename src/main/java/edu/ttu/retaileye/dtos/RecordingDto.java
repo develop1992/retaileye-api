@@ -19,6 +19,7 @@ public class RecordingDto {
     private String fileSize;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Boolean isAnalyzed;
     private EmployeeShiftDto employeeShiftDto;
     private BodyCameraDto bodyCameraDto;
 
@@ -35,6 +36,7 @@ public class RecordingDto {
                 .fileSize(recording.getFileSize())
                 .startTime(recording.getStartTime())
                 .endTime(recording.getEndTime())
+                .isAnalyzed(recording.getIsAnalyzed())
                 .employeeShiftDto(EmployeeShiftDto.fromEntity(recording.getEmployeeShift()))
                 .bodyCameraDto(BodyCameraDto.fromEntity(recording.getBodyCamera()))
                 .build();
@@ -52,6 +54,7 @@ public class RecordingDto {
                 .fileSize(recordingDto.getFileSize())
                 .startTime(recordingDto.getStartTime())
                 .endTime(recordingDto.getEndTime())
+                .isAnalyzed(recordingDto.getIsAnalyzed())
                 .employeeShift(EmployeeShiftDto.toEntity(recordingDto.getEmployeeShiftDto()))
                 .bodyCamera(BodyCameraDto.toEntity(recordingDto.getBodyCameraDto()))
                 .build();

@@ -46,7 +46,10 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
             return Optional.of(recordingRepository.save(recording))
                     .map(RecordingDto::fromEntity)
                     .map(recDto -> {
-                        videoAnalysisService.analyzeVideo(recDto.getFileName());
+                        log.info("Video is not analyzed: {}", recDto);
+                        if(recDto.getIsAnalyzed() == null || !recDto.getIsAnalyzed()) {
+                            videoAnalysisService.analyzeVideo(recDto.getFileName());
+                        }
                         return recDto;
                     })
                     .orElseThrow(() -> new InternalException(errorMessage));
@@ -68,6 +71,7 @@ public class RecordingServiceImpl implements IService<RecordingDto, UUID> {
             existingRecording.setFileName(recordingDto.getFileName());
             existingRecording.setFileType(recordingDto.getFileType());
             existingRecording.setFileSize(recordingDto.getFileSize());
+            existingRecording.setIsAnalyzed(recordingDto.getIsAnalyzed());
             existingRecording.setBodyCamera(BodyCameraDto.toEntity(recordingDto.getBodyCameraDto()));
             existingRecording.setEmployeeShift(EmployeeShiftDto.toEntity(recordingDto.getEmployeeShiftDto()));
             existingRecording.setStartTime(recordingDto.getStartTime());

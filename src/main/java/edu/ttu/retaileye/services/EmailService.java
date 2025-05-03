@@ -27,13 +27,13 @@ public class EmailService {
                 .map(IncidentDto::getRecordingDto)
                 .map(RecordingDto::getEmployeeShiftDto)
                 .map(EmployeeShiftDto::getEmployeeDto)
-                .orElseThrow(() -> new InternalException("Employee not found"));
+                .orElse(null);
 
         var bodyCamera = savedIncidents.stream()
                 .findFirst()
                 .map(IncidentDto::getRecordingDto)
                 .map(RecordingDto::getBodyCameraDto)
-                .orElseThrow(() -> new InternalException("Body Camera not found"));
+                .orElse(null);
 
         var manager = employeeService.getByRole("manager")
                 .orElseThrow(() -> new InternalException("Manager not found"));
@@ -46,10 +46,10 @@ public class EmailService {
             // Prepare email content
             String subject = "New Incidents Detected";
             StringBuilder body = new StringBuilder(String.format(
-                    "Dear %s,\n\nThe following incidents have been detected from body camera %s, currently is in use by employee %s:\n\n",
+                    "Dear %s,\n\nThe following incidents have been detected from %s, %s:\n\n",
                     manager.getFullName(),
-                    bodyCamera.getSerialNumber(),
-                    employee.getFullName()));
+                    bodyCamera != null ? String.format("body camera %s", bodyCamera.getSerialNumber()) : "an uploaded video",
+                    employee != null ? String.format("currently is in use by employee %s", employee.getFullName()) : "analyzed recently"));
 
             for (IncidentDto incident : savedIncidents) {
                 body.append("Incident: ").append(incident.getDescription()).append("\n");
@@ -65,8 +65,7 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(body.toString());
 
-            log.info("Sending email notification to manager: {} regarding incidents detected from body camera: {} currently in use by employee: {}",
-                    manager.getFullName(), bodyCamera.getSerialNumber(), employee.getFullName());
+            log.info("Sending email notification to manager: {} regarding incidents", manager.getFullName());
 
             // Send email
             javaMailSender.send(message);

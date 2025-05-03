@@ -53,6 +53,7 @@ public class Recording {
     private String fileSize;
     private LocalDateTime startTime;
     private LocalDateTime endTime;
+    private Boolean isAnalyzed;
 
     @Override
     public final boolean equals(Object o) {
